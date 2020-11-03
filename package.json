@@ -1,5 +1,5 @@
 { "name": "esbrowserify-pmb",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Easily browserify ES modules. Think esmod-pmb/nodemjs but for browserify.",
   "keywords": ["browserify", "esm"],
 
@@ -16,12 +16,27 @@
 
   "private": false, "license": "ISC",
 
-  "main": "esb.js",
+  "main": "esbr.js",
   "scripts": { "test": "nodejs test/all.js" },
   "directories": { "test": "test" },
 
-  "dependencies": {},
+  "dependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-stage-0": "^7.8.3",
+    "babelify": "^10.0.0",
+    "brfs": "^2.0.2",
+    "browser-resolve": "^2.0.0",
+    "browserify": "^16.2.3",
+    "envify": "^4.1.0",
+    "esmify": "^2.1.1",
+    "is-string": "^1.0.4",
+    "nofs": "^0.12.2",
+    "pify": "^5.0.0",
+    "uglifyify": "^5.0.2"
+  },
   "devDependencies": {
+    "babel-regenerator-runtime": "^6.5.0"
   },
 
 
