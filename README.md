@@ -29,6 +29,13 @@ Where `opt` is an options object which supports these mostly optional keys:
   `false`: Don't minify.
   any other truthy value: Append the value to the browserify `plugins` option.
 * `envify` (object): Custom variables for [`envify`](https://npm.im/envify).
+* `targetPlatform`: What platform to target.
+  * `'browser'` or any false-y value (default): The bundle shall run in browsers.
+  * `'nodejs'`: The bundle shall run in node.js.
+* `refineBrOpt` (function): If set, it is invoked with one argument,
+  the generated browserify options, so they can be checked and refined.
+  Your function may modify them in-place and return a false-y value,
+  or return a new and improved options object.
 
 
 Returns a Promise for the bundle code as a string.

@@ -38,6 +38,16 @@ EX = function esbrowserify(opt) {
   }
   if (minify) { brOpt.transform.push(minify); }
 
+  (function targetPlatform(plat) {
+    if (!plat) { return; }
+    if (plat === 'browser') { return; }
+    if (plat === 'nodejs') {
+      brOpt.node = true;
+      return;
+    }
+    throw new Error('Unsupported target platform: ' + plat);
+  }(opt.targetPlatform));
+
   ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
   brOpt.transform = brOpt.transform.map(EX.resolveTransform);
   pr = EX.promisingBrowserify(brOpt).then(String);

@@ -1,5 +1,5 @@
 { "name": "esbrowserify-pmb",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Easily browserify ES modules. Think esmod-pmb/nodemjs but for browserify.",
   "keywords": ["browserify", "esm"],
 
