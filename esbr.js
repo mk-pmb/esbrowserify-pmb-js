@@ -107,6 +107,28 @@ EX.saveBundleAs = function saveBundleAs(dbgLv, destPath, code) {
 };
 
 
+EX.simpleFromManifest = function simpleFromManifest(rqr, upPath, mainFile) {
+  /*
+    rqr: Mandatory. Your compile script's require() function.
+    upPath: Optional. Path to the directory that holds your package.json.
+    mainFile: Optional. Path to your entry (main) script.
+  */
+  if (!upPath) {
+    upPath = '..';
+    /* Because the recommended place to call this from is
+       $REPO/build/compile_static_bundle.js */
+  }
+  var manif = rqr(upPath + '/package.json');
+  return EX({
+    srcAbs: rqr.resolve(mainFile || upPath),
+    targetPlatform: 'nodejs',
+    saveAs: './node_modules/' + (manif.name || 'unnamed') + '.static.js',
+    verbosity: 1,
+    minify: false, // The few bytes saved usually aren't worth the obfuscation.
+  });
+};
+
+
 
 
 
