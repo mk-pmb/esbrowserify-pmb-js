@@ -8,10 +8,11 @@ var EX, isStr = require('is-string'), promisify = require('pify'),
   promisedFs = require('nofs');
 
 function ifArg(x, f) { return x && f(x); }
+function jsonDeepCopy(orig) { return JSON.parse(JSON.stringify(orig)); }
 
 
 EX = function esbrowserify(opt) {
-  var brOpt, babOpt, pr, dbgLv = (+opt.verbosity || 0),
+  var brOpt, babOpt, pr, extras = {}, dbgLv = (+opt.verbosity || 0),
     minify = opt.minify,
     srcAbs = resolvePath(String(opt.srcAbs || ''));
   if (dbgLv >= 1) { console.info('Gonna esbrowserify: %s', srcAbs); }
@@ -50,6 +51,7 @@ EX = function esbrowserify(opt) {
 
   ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
   brOpt.transform = brOpt.transform.map(EX.resolveTransform);
+  extras.effectiveBrowserifyConfig = brOpt;
   pr = EX.promisingBrowserify(brOpt).then(String);
 
   ifArg(opt.saveAs, function maybeSave(saveAs) {
@@ -57,6 +59,7 @@ EX = function esbrowserify(opt) {
     pr = pr.then(EX.saveBundleAs.bind(null, dbgLv, saveAs));
   });
 
+  Object.assign(pr, extras);
   return pr;
 };
 
@@ -86,9 +89,12 @@ EX.resolveTransform = function reso(x) {
 
 
 EX.promisingBrowserify = promisify(function startBundling(brOpt, next) {
-  browserify(brOpt).bundle(function unmute(err, data) {
-    // Browserify seems to silently discard any errors from this callback,
-    // so let's use setImmediate to break free:
+  var brfy = browserify(jsonDeepCopy(brOpt)); /*
+    Deep-copy because browserify seems (@2023-04-15) to modify the config
+    inplace in a way that creates loops. */
+  brfy.bundle(function unmute(err, data) {
+    /* Browserify seems to silently discard any errors from this callback,
+      so let's use setImmediate to break free: */
     setImmediate(function uncaught() { return next(err, data); });
   });
 });
