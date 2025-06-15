@@ -124,11 +124,12 @@ EX.simpleFromManifest = function simpleFromManifest(rqr, upPath, mainFile) {
     /* Because the recommended place to call this from is
        $REPO/build/compile_static_bundle.js */
   }
-  var manif = rqr(upPath + '/package.json');
+  var manif = rqr(upPath + '/package.json'),
+    modName = (manif.name || 'unnamed');
   return EX({
     srcAbs: rqr.resolve(mainFile || upPath),
     targetPlatform: 'nodejs',
-    saveAs: './node_modules/' + (manif.name || 'unnamed') + '.static.js',
+    saveAs: (upPath + '/node_modules/' + modName + '.static.js'),
     verbosity: 1,
     minify: false, // The few bytes saved usually aren't worth the obfuscation.
   });
