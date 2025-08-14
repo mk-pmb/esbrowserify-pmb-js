@@ -33,6 +33,7 @@
     "envify": "^4.1.0",
     "esmify": "^2.1.1",
     "is-string": "^1.0.7",
+    "lodash.mapvalues": "^4.6.0",
     "merge-options": "^3.0.4",
     "nofs": "^0.12.3",
     "pify": "^5.0.0",

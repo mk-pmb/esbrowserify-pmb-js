@@ -5,6 +5,7 @@
 var EX,
   // ==BEGIN== Sorted part of our dependencies
   isStr = require('is-string'),
+  loMapValues = require('lodash.mapvalues'),
   mergeOpt = require('merge-options'),
   promisedFs = require('nofs'),
   promisify = require('pify'),
@@ -62,7 +63,7 @@ EX = function esbrowserify(opt) {
   ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
   brOpt.transform = brOpt.transform.map(EX.resolveTransform);
   fx.effectiveBrowserifyConfig = brOpt;
-  pr = EX.promisingBrowserify(brOpt).then(String);
+  pr = EX.promisingBrowserify(brOpt, opt).then(String);
 
   ifArg(opt.saveAs, function maybeSave(saveAs) {
     saveAs = resolvePath(srcAbs, '..', saveAs);
@@ -115,7 +116,7 @@ EX.resolveTransform = function reso(x) {
 };
 
 
-EX.promisingBrowserify = promisify(function startBundling(brOpt, next) {
+EX.promisingBrowserify = promisify(function startBundling(brOpt, opt, next) {
   var brfy = browserify(jsonDeepCopy(brOpt)); /*
     Deep-copy because browserify seems (@2023-04-15) to modify the config
     inplace in a way that creates loops. */
@@ -129,6 +130,7 @@ EX.promisingBrowserify = promisify(function startBundling(brOpt, next) {
     }
     // Require for anything outside esbr: Not our problem.
   });
+  loMapValues(opt.on || {}, function install(f, ev) { brfy.on(ev, f); });
   brfy.bundle(function unmute(err, data) {
     /* Browserify seems to silently discard any errors from this callback,
       so let's use setImmediate to break free: */
