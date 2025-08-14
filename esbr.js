@@ -12,6 +12,8 @@ var EX,
   // ==ENDOF== Sorted part of our dependencies
   browserify = require('browserify');
 
+
+function fail(why) { throw new Error(why); }
 function ifArg(x, f) { return x && f(x); }
 function jsonDeepCopy(orig) { return JSON.parse(JSON.stringify(orig)); }
 
@@ -52,7 +54,7 @@ EX = function esbrowserify(opt) {
       brOpt.node = true;
       return;
     }
-    throw new Error('Unsupported target platform: ' + plat);
+    fail('Unsupported target platform: ' + plat);
   }(opt.targetPlatform));
 
   ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
@@ -118,7 +120,7 @@ EX.saveBundleAs = function saveBundleAs(dbgLv, destPath, code) {
   if (dbgLv >= 1) {
     console.info('Write %s bytes to: %s', code.length, destPath);
   }
-  if (!code) { throw new Error('Empty bundle!'); }
+  if (!code) { fail('Empty bundle!'); }
   var pr = promisedFs.writeFile(destPath, code, { encoding: 'UTF-8' });
   if (dbgLv >= 1) { pr = pr.then(logDone); }
   return pr;
