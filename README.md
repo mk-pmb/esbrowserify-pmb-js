@@ -20,6 +20,8 @@ This module exports one function:
 Where `opt` is an options object which supports these mostly optional keys:
 
 * `srcAbs` (string, required): Absolute path to your entrypoint.
+  * If the final path segment is called `package.json`, rather than bundling
+    that JSON file, bundle all the `dependencies` listed there.
 * `saveAs` (string): If truthy, path where to save the bundle code.
   May be relative to `srcAbs`.
 * `verbosity` (number): Log level. 0 = silent (default),

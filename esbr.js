@@ -5,11 +5,13 @@
 
 var EX,
   // ==BEGIN== Sorted part of our dependencies
+  fileBaseName = require('path').basename,
   isStr = require('is-string'),
   loMapValues = require('lodash.mapvalues'),
   mergeOpt = require('merge-options'),
   promisedFs = require('nofs'),
   promisify = require('pify'),
+  readDataFile = require('read-data-file'),
   relPath = require('absdir')(module, '.'),
   resolvePath = require('path').resolve,
   // ==ENDOF== Sorted part of our dependencies
@@ -42,7 +44,7 @@ EX = function esbrowserify(opt) {
       ['envify', Object.assign(EX.defaultEnvifyVars, opt.envify)],
       'brfs',
     ]).filter(Boolean),
-    entries: [srcAbs],
+    entries: [],
     require: [].concat(opt.extraPkg).filter(Boolean),
   }, opt.brOpt);
 
@@ -70,6 +72,16 @@ EX = function esbrowserify(opt) {
   }(opt.targetPlatform));
 
   pr = Promise.resolve();
+
+  if (fileBaseName(srcAbs) === 'package.json') {
+    pr = pr.then(readDataFile.bind(null, srcAbs));
+    pr = pr.then(function addDeps(pkgManif) {
+      function addOneDep(dep) { brOpt.require.push(dep); }
+      Object.keys(pkgManif.dependencies || false).sort().forEach(addOneDep);
+    });
+  } else {
+    brOpt.entries.push(srcAbs);
+  }
 
   pr = pr.then(opt.onBeforeRefine);
 
