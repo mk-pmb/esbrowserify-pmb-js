@@ -1,5 +1,5 @@
 { "name": "esbrowserify-pmb",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Easily browserify ES modules. Think esmod-pmb/nodemjs but for browserify.",
   "keywords": ["browserify", "esm"],
 
@@ -19,6 +19,7 @@
   "main": "esbr.js",
   "scripts": { "test": "nodejs test/all.js" },
   "directories": { "test": "test" },
+  "eslintConfig": { "extends": "nodejs-pmb" },
 
   "dependencies": {
     "@babel/core": "^7.17.5",
@@ -41,7 +42,10 @@
     "uglifyify": "^5.0.2"
   },
   "devDependencies": {
-    "babel-regenerator-runtime": "^6.5.0"
+    "babel-regenerator-runtime": "^6.5.0",
+    "eslint-config-nodejs-pmb": "^0.3.9",
+    "eslint-plugin-json-light-pmb": "^1.0.7",
+    "eslint-plugin-n": "^17.16.2"
   },
 
 
