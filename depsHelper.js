@@ -5,6 +5,7 @@
 require('@babel/core');
 require('@babel/preset-env');
 require('@babel/preset-stage-0');
+require('aliasify');
 require('babelify');
 require('brfs');
 require('browser-resolve');

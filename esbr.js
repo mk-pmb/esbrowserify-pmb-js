@@ -31,6 +31,7 @@ EX = function esbrowserify(opt) {
       'esmify',
     ],
     transform: [].concat(opt.earlyTransform, [
+      ['aliasify', Object.assign(EX.defaultAliasifyOpt, opt.aliasify)],
       ['babelify', babOpt],
       ['envify', Object.assign(EX.defaultEnvifyVars, opt.envify)],
       'brfs',
@@ -80,6 +81,12 @@ EX.defaultEnvifyVars = (function () {
   var v = {}, usc = '_';
   v[usc] = 'purge';
   return v;
+}());
+
+
+EX.defaultAliasifyOpt = (function decideDefaultAliasifyOpt() {
+  var ali = {}, rpl = {};
+  return { aliases: ali, replacements: rpl, verbose: false };
 }());
 
 
