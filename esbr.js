@@ -17,7 +17,7 @@ function jsonDeepCopy(orig) { return JSON.parse(JSON.stringify(orig)); }
 
 
 EX = function esbrowserify(opt) {
-  var brOpt, babOpt, pr, extras = {}, dbgLv = (+opt.verbosity || 0),
+  var brOpt, babOpt, pr, fx = {}, dbgLv = (+opt.verbosity || 0),
     minify = opt.minify,
     srcAbs = resolvePath(String(opt.srcAbs || ''));
   if (dbgLv >= 1) { console.info('Gonna esbrowserify: %s', srcAbs); }
@@ -57,7 +57,7 @@ EX = function esbrowserify(opt) {
 
   ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
   brOpt.transform = brOpt.transform.map(EX.resolveTransform);
-  extras.effectiveBrowserifyConfig = brOpt;
+  fx.effectiveBrowserifyConfig = brOpt;
   pr = EX.promisingBrowserify(brOpt).then(String);
 
   ifArg(opt.saveAs, function maybeSave(saveAs) {
@@ -65,7 +65,7 @@ EX = function esbrowserify(opt) {
     pr = pr.then(EX.saveBundleAs.bind(null, dbgLv, saveAs));
   });
 
-  Object.assign(pr, extras);
+  Object.assign(pr, fx);
   return pr;
 };
 
