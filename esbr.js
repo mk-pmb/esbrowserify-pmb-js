@@ -8,6 +8,7 @@ var EX,
   mergeOpt = require('merge-options'),
   promisedFs = require('nofs'),
   promisify = require('pify'),
+  relPath = require('absdir')(module, '.'),
   resolvePath = require('path').resolve,
   // ==ENDOF== Sorted part of our dependencies
   browserify = require('browserify');
@@ -72,6 +73,17 @@ EX = function esbrowserify(opt) {
 };
 
 
+EX.pkgName = require('./package.json').name;
+EX.esbrDir = relPath('.');
+EX.stubsDir = relPath('./fx/stubs');
+
+function pathInsideDir(path, dir) {
+  if (!path) { fail('pathInsideDir: no path!'); }
+  if (!dir) { fail('pathInsideDir: no dir!'); }
+  return (resolvePath(path) + '/').startsWith(dir + '/');
+}
+
+
 EX.defaultBabelifyPresets = [
   '@babel/preset-env',
 ];
@@ -106,6 +118,16 @@ EX.promisingBrowserify = promisify(function startBundling(brOpt, next) {
   var brfy = browserify(jsonDeepCopy(brOpt)); /*
     Deep-copy because browserify seems (@2023-04-15) to modify the config
     inplace in a way that creates loops. */
+  brfy.on('file', function warnSelfRequire(absPath, id) {
+    // Allow require-ing our stubs, assuming they will be dealt with later:
+    if (pathInsideDir(absPath, EX.stubsDir)) { return; }
+    // Disallow require-ing anything else from esbr because that would
+    // probably be an accident:
+    if (pathInsideDir(absPath, EX.esbrDir)) {
+      fail('Source is trying to require ' + absPath + ' as ' + id);
+    }
+    // Require for anything outside esbr: Not our problem.
+  });
   brfy.bundle(function unmute(err, data) {
     /* Browserify seems to silently discard any errors from this callback,
       so let's use setImmediate to break free: */
