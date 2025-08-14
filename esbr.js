@@ -5,6 +5,7 @@
 var EX,
   // ==BEGIN== Sorted part of our dependencies
   isStr = require('is-string'),
+  mergeOpt = require('merge-options'),
   promisedFs = require('nofs'),
   promisify = require('pify'),
   resolvePath = require('path').resolve,
@@ -23,7 +24,7 @@ EX = function esbrowserify(opt) {
   babOpt = {
     presets: EX.defaultBabelifyPresets.map(require.resolve),
   };
-  brOpt = {
+  brOpt = mergeOpt({
     sourceType: 'module',
     extensions: ['.mjs', '.jsm', '.js'],
     debug: true,
@@ -37,7 +38,7 @@ EX = function esbrowserify(opt) {
       'brfs',
     ]).filter(Boolean),
     entries: [srcAbs],
-  };
+  }, opt.brOpt);
 
   if ((minify === undefined) || (minify === true)) {
     minify = EX.defaultMinifier;
