@@ -30,11 +30,11 @@ EX = function esbrowserify(opt) {
     plugins: [
       'esmify',
     ],
-    transform: [
+    transform: [].concat(opt.earlyTransform, [
       ['babelify', babOpt],
       ['envify', Object.assign(EX.defaultEnvifyVars, opt.envify)],
       'brfs',
-    ],
+    ]).filter(Boolean),
     entries: [srcAbs],
   };
 
