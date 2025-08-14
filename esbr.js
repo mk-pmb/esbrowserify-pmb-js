@@ -1,5 +1,6 @@
 ﻿/*jslint indent: 2, maxlen: 80, continue: false, unparam: false, node: true */
 /* -*- tab-width: 2 -*- */
+/*global Promise: true */
 'use strict';
 
 var EX,
@@ -45,6 +46,14 @@ EX = function esbrowserify(opt) {
     require: [].concat(opt.extraPkg).filter(Boolean),
   }, opt.brOpt);
 
+  function installFxGetter(name, value) {
+    return function installer(x) {
+      if (value === undefined) { value = x; }
+      fx['get' + name] = function get() { return value; };
+      return x;
+    };
+  }
+
   if ((minify === undefined) || (minify === true)) {
     minify = EX.defaultMinifier;
   }
@@ -60,17 +69,31 @@ EX = function esbrowserify(opt) {
     fail('Unsupported target platform: ' + plat);
   }(opt.targetPlatform));
 
-  ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
-  brOpt.transform = brOpt.transform.map(EX.resolveTransform);
-  fx.effectiveBrowserifyConfig = brOpt;
-  pr = EX.promisingBrowserify(brOpt, opt).then(String);
+  pr = Promise.resolve();
+
+  pr = pr.then(opt.onBeforeRefine);
+
+  pr = pr.then(function actuallyBrowserifyForRealNow() {
+    ifArg(opt.refineBrOpt, function refine(f) { brOpt = f(brOpt) || brOpt; });
+    brOpt.transform = brOpt.transform.map(EX.resolveTransform);
+    installFxGetter('EffectiveBrowserifyConfig')(brOpt);
+    return EX.promisingBrowserify(brOpt, opt);
+  });
+
+  pr = pr.then(installFxGetter('UnstringifiedCode'));
+  pr = pr.then(opt.onBeforeStringifyCode);
+  pr = pr.then(String);
+  pr = pr.then(installFxGetter('StringifiedCode'));
+  pr = pr.then(opt.onAfterStringifyCode);
 
   ifArg(opt.saveAs, function maybeSave(saveAs) {
     saveAs = resolvePath(srcAbs, '..', saveAs);
     pr = pr.then(EX.saveBundleAs.bind(null, dbgLv, saveAs));
+    pr = pr.then(opt.onSaved);
   });
 
-  Object.assign(pr, fx);
+  pr = pr.then(opt.onDone);
+  pr.fx = fx;
   return pr;
 };
 
