@@ -2,10 +2,14 @@
 /* -*- tab-width: 2 -*- */
 'use strict';
 
-var EX, isStr = require('is-string'), promisify = require('pify'),
+var EX,
+  // ==BEGIN== Sorted part of our dependencies
+  isStr = require('is-string'),
+  promisedFs = require('nofs'),
+  promisify = require('pify'),
   resolvePath = require('path').resolve,
-  browserify = require('browserify'),
-  promisedFs = require('nofs');
+  // ==ENDOF== Sorted part of our dependencies
+  browserify = require('browserify');
 
 function ifArg(x, f) { return x && f(x); }
 function jsonDeepCopy(orig) { return JSON.parse(JSON.stringify(orig)); }
