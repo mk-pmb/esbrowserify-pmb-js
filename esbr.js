@@ -41,6 +41,7 @@ EX = function esbrowserify(opt) {
       'brfs',
     ]).filter(Boolean),
     entries: [srcAbs],
+    require: [].concat(opt.extraPkg).filter(Boolean),
   }, opt.brOpt);
 
   if ((minify === undefined) || (minify === true)) {
