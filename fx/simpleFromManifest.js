@@ -33,7 +33,13 @@ const EX = function simpleFromManifest(rqr, userOpt) {
     saveSuf: '.static.js',
   }, manifData.esbrowserify, userOpt);
   Object.keys(esbrOpt).forEach(function upd(k) { esbrOpt[k] = opt[k]; });
-  esbrOpt.srcAbs = rqr.resolve(opt.mainFile || upPath);
+  const srcRel = (opt.mainFile || upPath || './');
+  try {
+    esbrOpt.srcAbs = rqr.resolve(srcRel);
+  } catch (failResolveSrcAbs) {
+    console.error('E: Failed to resolve srcAbs from', [srcRel]);
+    throw failResolveSrcAbs;
+  }
   esbrOpt.saveAs = pathLib.join(manifDir,
     opt.saveDir + opt.modName + opt.saveSuf);
   return esbr(esbrOpt);
